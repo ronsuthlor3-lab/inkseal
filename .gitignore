@@ -1,0 +1,5 @@
+node_modules/
+*.inkseal-id.json
+inkseal-identity-*.json
+*.sealed.*
+*.ots

@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Inkseal</title>
+  <meta name="description" content="Seal your artwork with your handwriting, an unforgeable digital signature and an invisible creator ID. Free and open source.">
+  <link rel="icon" href="web/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="web/style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <img src="web/icon.svg" alt="" width="36" height="36">
+      <div>
+        <h1>Inkseal</h1>
+        <p class="tagline" data-i18n="tagline"></p>
+      </div>
+    </div>
+    <div class="lang" role="group" aria-label="Language">
+      <button type="button" data-lang="th">ไทย</button>
+      <button type="button" data-lang="en">EN</button>
+    </div>
+  </header>
+
+  <p class="privacy"><span aria-hidden="true">🔒</span> <span data-i18n="privacy"></span></p>
+  <div id="unsupported" class="banner error" hidden data-i18n="errNoEd25519"></div>
+
+  <nav class="tabs" role="tablist">
+    <button role="tab" data-tab="identity"><span class="num">1</span><span data-i18n="tabIdentity"></span></button>
+    <button role="tab" data-tab="signature"><span class="num">2</span><span data-i18n="tabSignature"></span></button>
+    <button role="tab" data-tab="seal"><span class="num">3</span><span data-i18n="tabSeal"></span></button>
+    <button role="tab" data-tab="verify"><span class="num">✓</span><span data-i18n="tabVerify"></span></button>
+  </nav>
+
+  <main>
+    <!-- 1. Identity -->
+    <section id="tab-identity" class="panel" role="tabpanel">
+      <h2 data-i18n="idTitle"></h2>
+      <p class="muted" data-i18n="idIntro"></p>
+
+      <div id="id-active" class="card active-id" hidden>
+        <div>
+          <div class="label" data-i18n="idActive"></div>
+          <div class="big" id="id-active-name"></div>
+          <div class="label"><span data-i18n="idCreatorId"></span>: <code id="id-active-fp"></code></div>
+          <p class="msg" id="msg-active" role="status"></p>
+        </div>
+        <button type="button" class="secondary" id="id-lock" data-i18n="idLock"></button>
+      </div>
+
+      <div id="id-saved" class="card" hidden>
+        <h3 data-i18n="idSaved"></h3>
+        <p><strong id="id-saved-name"></strong> · <code id="id-saved-fp"></code></p>
+        <form id="form-saved" class="row">
+          <input type="password" id="saved-pass" autocomplete="current-password" data-i18n-placeholder="idPass" required>
+          <button type="submit" data-i18n="idOpenBtn"></button>
+          <button type="button" class="link" id="id-forget" data-i18n="idForget"></button>
+        </form>
+        <p class="msg" id="msg-saved" role="status"></p>
+      </div>
+
+      <div class="grid2" id="id-forms">
+        <form id="form-create" class="card">
+          <h3 data-i18n="idCreate"></h3>
+          <label><span data-i18n="idName"></span><input id="new-name" required maxlength="80"></label>
+          <label><span data-i18n="idContact"></span><input id="new-contact" maxlength="200"></label>
+          <label><span data-i18n="idPass"></span><input type="password" id="new-pass" autocomplete="new-password" required minlength="8"></label>
+          <label><span data-i18n="idPass2"></span><input type="password" id="new-pass2" autocomplete="new-password" required minlength="8"></label>
+          <button type="submit" data-i18n="idCreateBtn"></button>
+          <p class="msg" id="msg-create" role="status"></p>
+        </form>
+
+        <form id="form-open" class="card">
+          <h3 data-i18n="idOpen"></h3>
+          <label><span data-i18n="idFile"></span><input type="file" id="open-file" accept=".json,application/json" required></label>
+          <label><span data-i18n="idPass"></span><input type="password" id="open-pass" autocomplete="current-password" required></label>
+          <label class="check"><input type="checkbox" id="open-remember"> <span data-i18n="idRemember"></span></label>
+          <button type="submit" data-i18n="idOpenBtn"></button>
+          <p class="msg" id="msg-open" role="status"></p>
+        </form>
+      </div>
+
+      <aside class="note">
+        <strong data-i18n="idWarnTitle"></strong>
+        <ul>
+          <li data-i18n="idWarn1"></li>
+          <li data-i18n="idWarn2"></li>
+          <li data-i18n="idWarn3"></li>
+        </ul>
+      </aside>
+    </section>
+
+    <!-- 2. Signature -->
+    <section id="tab-signature" class="panel" role="tabpanel" hidden>
+      <h2 data-i18n="sigTitle"></h2>
+      <p class="muted" data-i18n="sigIntro"></p>
+      <div class="card">
+        <canvas id="pad" class="pad"></canvas>
+        <div class="row wrap">
+          <label class="inline"><span data-i18n="sigColor"></span>
+            <span class="swatches" id="swatches">
+              <button type="button" style="--c:#1b2a6b" data-color="#1b2a6b" aria-label="Navy"></button>
+              <button type="button" style="--c:#111111" data-color="#111111" aria-label="Black"></button>
+              <button type="button" style="--c:#8a1c1c" data-color="#8a1c1c" aria-label="Red"></button>
+              <button type="button" style="--c:#ffffff" data-color="#ffffff" aria-label="White"></button>
+              <input type="color" id="pad-color" value="#1b2a6b" aria-label="Custom">
+            </span>
+          </label>
+          <label class="inline"><span data-i18n="sigWidth"></span><input type="range" id="pad-width" min="1.5" max="10" step="0.5" value="4"></label>
+          <span class="spacer"></span>
+          <button type="button" class="secondary" id="pad-undo" data-i18n="sigUndo"></button>
+          <button type="button" class="secondary" id="pad-clear" data-i18n="sigClear"></button>
+          <button type="button" id="pad-save" data-i18n="sigSave"></button>
+        </div>
+        <label class="upload"><span data-i18n="sigUpload"></span><input type="file" id="sig-upload" accept="image/png,image/webp,image/*"></label>
+        <p class="msg" id="msg-sig" role="status"></p>
+      </div>
+      <div class="card">
+        <h3 data-i18n="sigSaved"></h3>
+        <div class="sig-preview checker"><img id="sig-current" alt=""><span id="sig-none" data-i18n="sigNone"></span></div>
+      </div>
+    </section>
+
+    <!-- 3. Seal -->
+    <section id="tab-seal" class="panel" role="tabpanel" hidden>
+      <h2 data-i18n="sealTitle"></h2>
+      <div id="seal-need-id" class="banner warn" data-i18n="sealNeedId"></div>
+
+      <label class="drop" id="seal-drop">
+        <input type="file" id="seal-file" accept="image/png,image/jpeg,image/webp">
+        <span data-i18n="sealDrop"></span>
+      </label>
+
+      <div id="seal-work" hidden>
+        <div class="seal-layout">
+          <div class="preview-wrap">
+            <canvas id="seal-preview" class="preview"></canvas>
+            <p class="muted small" data-i18n="sealDragHint"></p>
+          </div>
+          <form id="form-seal" class="card options">
+            <div id="seal-warnings"></div>
+
+            <h3 data-i18n="sealVisible"></h3>
+            <label class="check"><input type="checkbox" id="opt-show-sig" checked> <span data-i18n="sealShowSig"></span></label>
+            <label><span data-i18n="sealSize"></span><input type="range" id="opt-size" min="0.05" max="0.8" step="0.01" value="0.25"></label>
+            <label><span data-i18n="sealOpacity"></span><input type="range" id="opt-opacity" min="0.15" max="1" step="0.05" value="0.9"></label>
+            <div class="corners" role="group">
+              <button type="button" data-pos="tl">↖</button><button type="button" data-pos="tr">↗</button>
+              <button type="button" data-pos="center">◎</button>
+              <button type="button" data-pos="bl">↙</button><button type="button" data-pos="br">↘</button>
+            </div>
+
+            <h3 data-i18n="sealInfo"></h3>
+            <label><span data-i18n="sealWorkTitle"></span><input id="opt-title" maxlength="200"></label>
+            <label><span data-i18n="sealDesc"></span><textarea id="opt-desc" rows="2" maxlength="1000"></textarea></label>
+            <label><span data-i18n="sealLicense"></span>
+              <select id="opt-license">
+                <option value="All rights reserved" data-i18n="licAll"></option>
+                <option value="CC BY 4.0" data-i18n="licBy"></option>
+                <option value="CC BY-NC 4.0" data-i18n="licByNc"></option>
+                <option value="CC BY-NC-ND 4.0" data-i18n="licByNcNd"></option>
+              </select>
+            </label>
+
+            <h3 data-i18n="sealProtect"></h3>
+            <label class="check"><input type="checkbox" id="opt-wm" checked> <span data-i18n="sealWatermark"></span></label>
+            <select id="opt-strength" aria-label="Strength">
+              <option value="normal" data-i18n="strengthNormal"></option>
+              <option value="strong" data-i18n="strengthStrong"></option>
+            </select>
+            <label><span data-i18n="sealFormat"></span>
+              <select id="opt-format">
+                <option value="png" data-i18n="fmtPng"></option>
+                <option value="jpeg" data-i18n="fmtJpeg"></option>
+              </select>
+            </label>
+            <label class="check"><input type="checkbox" id="opt-ts"> <span data-i18n="sealTimestamp"></span></label>
+            <p class="muted small" data-i18n="sealTimestampHelp"></p>
+
+            <button type="submit" id="seal-btn" class="primary" data-i18n="sealBtn"></button>
+            <p class="msg" id="msg-seal" role="status"></p>
+            <div id="seal-result" class="result" hidden>
+              <strong data-i18n="sealDone"></strong>
+              <a id="dl-image" class="button secondary" data-i18n="sealDownloadAgain"></a>
+              <a id="dl-ots" class="button secondary" hidden data-i18n="sealDownloadOts"></a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Verify -->
+    <section id="tab-verify" class="panel" role="tabpanel" hidden>
+      <h2 data-i18n="verifyTitle"></h2>
+      <p class="muted" data-i18n="verifyIntro"></p>
+      <label class="drop" id="verify-drop">
+        <input type="file" id="verify-file" accept="image/png,image/jpeg,image/webp">
+        <span data-i18n="verifyDrop"></span>
+      </label>
+      <div id="verify-report"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p data-i18n="footer"></p>
+    <p><a href="https://github.com/ronsuthlor3-lab/inkseal" id="repo-link">GitHub</a> · v<span id="version"></span></p>
+  </footer>
+
+  <script type="module" src="web/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+  "name": "inkseal",
+  "version": "0.1.0",
+  "description": "Seal artwork with your handwriting, an unforgeable digital signature and an invisible creator ID.",
+  "type": "module",
+  "bin": {
+    "inkseal": "cli/inkseal.js"
+  },
+  "files": [
+    "cli/",
+    "core/"
+  ],
+  "scripts": {
+    "test": "node --test test/"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "jpeg-js": "^0.4.4",
+    "pngjs": "^7.0.0"
+  },
+  "keywords": [
+    "watermark",
+    "provenance",
+    "copyright",
+    "signature",
+    "artwork",
+    "ed25519",
+    "opentimestamps"
+  ],
+  "license": "MIT"
+}
